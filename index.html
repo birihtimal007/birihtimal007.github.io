@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Süresiz Sayaç</title>
+
+    <style>
+        /* GENEL VE ARKA PLAN AYARLARI */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Space Mono', monospace; 
+            color: #FFFFFF; 
+            background-color: #000000; 
+            /* Sayacı ekranın tam ortasına hizalamak için */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* SAYAÇ KUTUSU */
+        #sayac {
+            font-size: 8vw; /* Ekran genişliğine göre dinamik boyut */
+            font-weight: 700;
+            display: flex;
+            align-items: center; /* Rakamlar aynı hizada olsun */
+            user-select: none; /* Sayıların seçilmesini engeller */
+        }
+
+        /* RAKAMLAR VE PARLAKLIK EFEKTİ */
+        #sayac span {
+            display: inline-block;
+            min-width: 0.8em;
+            padding: 5px 10px;
+            
+            color: #FFFFFF; 
+            text-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.4);
+        }
+        
+        /* İKİ NOKTA ÜST ÜSTE (Separator) */
+        .separator {
+            color: #888888; /* Biraz daha soluk */
+            font-size: 1em;
+            padding: 0 5px;
+            text-shadow: none; /* Separator'de parlaklık olmasın */
+        }
+
+        /* Responsiveness: Çok dar ekranlar için boyutu daha da küçültelim */
+        @media (max-width: 600px) {
+            #sayac { 
+                font-size: 12vw; /* Telefonlarda daha büyük görünmesi için %12'ye çıkardık */
+            }
+        }
+
+        /* Ek font kullanımı için Google Font yüklemesi */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div id="sayac">
+        <span id="saat">00</span>
+        <span class="separator">:</span>
+        <span id="dakika">00</span>
+        <span class="separator">:</span>
+        <span id="saniye">00</span>
+    </div>
+
+    <!-- JAVASCRIPT KODU -->
+    <script>
+        // ***********************************************
+        // BAŞLANGIÇ TARİHİ AYARI - BURAYI KENDİ TARİHİNİZLE GÜNCELLEYİN!
+        // Şu anki tarih (24 Ekim 2025) itibarıyla sayması için örnek bir tarih (24 Ekim 2024) bırakıldı.
+        // Format: Yıl, Ay (0=Ocak, 11=Aralık), Gün, Saat, Dakika, Saniye
+        const baslangicTarihi = new Date(2025, 07, 25, 11, 51, 00).getTime(); 
+        // ***********************************************
+
+        const sayaciGuncelle = () => {
+            const simdi = new Date().getTime();
+            const fark = simdi - baslangicTarihi;
+
+            if (fark < 0) {
+                // Eğer başlangıç tarihi gelecekteyse
+                document.getElementById('sayac').innerHTML = "<span style='color: #888; font-size: 0.2em; text-shadow: none;'>BAŞLANGIÇ TARİHİ BEKLENİYOR...</span>";
+                return;
+            }
+            
+            // Toplam milisaniyeyi hesapla
+            let saat = Math.floor(fark / (1000 * 60 * 60));
+            let dakika = Math.floor((fark % (1000 * 60 * 60)) / (1000 * 60));
+            let saniye = Math.floor((fark % (1000 * 60)) / 1000);
+
+            // Tek haneli sayıların önüne '0' eklemek (Saat kısmı 2 haneden fazla olabilir, onu olduğu gibi formatlayalım)
+            const formatla = (sayi, pad = 2) => String(sayi).padStart(pad, '0');
+            
+            // Ekrana yazdırma
+            document.getElementById('saat').textContent = formatla(saat);
+            document.getElementById('dakika').textContent = formatla(dakika);
+            document.getElementById('saniye').textContent = formatla(saniye);
+        }
+
+        // Sayacı her saniye güncelle
+        setInterval(sayaciGuncelle, 1000);
+
+        // Sayfa yüklendiğinde bir kere çalıştır
+        sayaciGuncelle();
+    </script>
+</body>
+</html>
